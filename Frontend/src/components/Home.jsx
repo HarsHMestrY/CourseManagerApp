@@ -5,6 +5,7 @@ import { NavLink } from 'react-router-dom'
 const Home = () => {
 
     const [courses, setCourses] = useState([])
+    const [search, setSearch] = useState("")
 
     useEffect(() => {
         getCourses()
@@ -36,77 +37,126 @@ const Home = () => {
             })
     }
 
+    const filteredCourses = courses.filter((course) => {
+
+        return (
+            (course.courseName || "")
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            (course.instructor || "")
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            (course.category || "")
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+
+            (course.level || "")
+                .toLowerCase()
+                .includes(search.toLowerCase())
+        )
+    })
+
     return (
 
         <div className="container mt-4">
 
-            <div className="row">
+            <div className="row mb-4">
 
-                {
-                    courses.map((course) => (
+                <div className="col-md-6 mx-auto">
 
-                        <div className="col-md-4 mb-3" key={course._id}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="🔍 Search Course..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
 
-                            <div className="card">
+                </div>
 
-                                <img
-                                    src={course.thumbnail}
-                                    className="card-img-top"
-                                    height="200"
-                                />
+            </div>
 
-                                <div className="card-body">
+            {
+                filteredCourses.length === 0 ? (
 
-                                    <h5>
-                                        {course.courseName}
-                                    </h5>
+                    <h4 className="text-center">
+                        No Courses Found
+                    </h4>
 
-                                    <p>
-                                        Instructor:
-                                        {course.instructor}
-                                    </p>
+                ) : (
 
-                                    <p>
-                                        Category:
-                                        {course.category}
-                                    </p>
+                    <div className="row">
 
-                                    <p>
-                                        Duration:
-                                        {course.duration} Hours
-                                    </p>
+                        {
+                            filteredCourses.map((course) => (
 
-                                    <p>
-                                        Level:
-                                        {course.level}
-                                    </p>
+                                <div
+                                    className="col-md-4 mb-3"
+                                    key={course._id}
+                                >
 
-                                    <NavLink
-                                        className="btn btn-warning me-2"
-                                        to={`/edit/${course._id}`}
-                                    >
-                                        Edit
-                                    </NavLink>
+                                    <div className="card">
 
-                                    <button
-                                        className="btn btn-danger"
-                                        onClick={() =>
-                                            deleteCourse(course._id)
-                                        }
-                                    >
-                                        Delete
-                                    </button>
+                                        <img
+                                            src={course.thumbnail}
+                                            alt={course.courseName}
+                                            className="card-img-top"
+                                            height="200"
+                                        />
+
+                                        <div className="card-body">
+
+                                            <h5>
+                                                {course.courseName}
+                                            </h5>
+
+                                            <p>
+                                                <b>Instructor:</b> {course.instructor}
+                                            </p>
+
+                                            <p>
+                                                <b>Category:</b> {course.category}
+                                            </p>
+
+                                            <p>
+                                                <b>Duration:</b> {course.duration} Hours
+                                            </p>
+
+                                            <p>
+                                                <b>Level:</b> {course.level}
+                                            </p>
+
+                                            <NavLink
+                                                className="btn btn-warning me-2"
+                                                to={`/edit/${course._id}`}
+                                            >
+                                                Edit
+                                            </NavLink>
+
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() =>
+                                                    deleteCourse(course._id)
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </div>
+
+                                    </div>
 
                                 </div>
 
-                            </div>
+                            ))
+                        }
 
-                        </div>
+                    </div>
 
-                    ))
-                }
-
-            </div>
+                )
+            }
 
         </div>
     )
